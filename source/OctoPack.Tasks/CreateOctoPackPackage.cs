@@ -23,11 +23,13 @@ namespace OctoPack.Tasks
 
         public CreateOctoPackPackage() : this(new OctopusPhysicalFileSystem())
         {
+            
         }
 
         public CreateOctoPackPackage(IOctopusFileSystem fileSystem)
         {
             this.fileSystem = fileSystem;
+            this.UseDefaultExcludes = true;
         }
 
         /// <summary>
@@ -74,6 +76,12 @@ namespace OctoPack.Tasks
         /// Allows release notes to be attached to the NuSpec file when building.
         /// </summary>
         public string ReleaseNotesFile { get; set; }
+        
+        /// <summary>
+        /// Allows overriding the default exclusion rules in NuGet.exe.  This lets you use
+        /// file paths with '.' characters in them (such as '.nuget/*').
+        /// </summary>
+        public bool UseDefaultExcludes { get; set; }
 
         /// <summary>
         /// Used to output the list of built packages.
@@ -317,6 +325,10 @@ namespace OctoPack.Tasks
             if (!string.IsNullOrWhiteSpace(PackageVersion))
             {
                 commandLine += " -Version " + PackageVersion;
+            }
+            if (!UseDefaultExcludes)
+            {
+                commandLine += " -NoDefaultExcludes"
             }
 
             LogMessage("NuGet.exe path: " + NuGetExePath, MessageImportance.Low);
